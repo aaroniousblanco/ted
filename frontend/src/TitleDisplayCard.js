@@ -50,8 +50,8 @@ const TitleDisplayCards = ({ titles, handleExpandClick }) => {
           <CardHeader
             avatar={
             (
-              <Avatar aria-label="recipe" className={classes.avatar}>
-                <img alt="popcorm" className={classes.svgImage} src="images/popcorn.svg" />
+              <Avatar aria-label="popcorn" className={classes.avatar}>
+                <img alt="popcorn" className={classes.svgImage} src="images/popcorn.svg" />
               </Avatar>
             )
             }
