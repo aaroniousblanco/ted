@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -9,20 +9,20 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Avatar from '@material-ui/core/Avatar';
-import CardMedia from '@material-ui/core/CardMedia';
+import PropTypes from 'prop-types';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
+const useStyles = makeStyles(() => createStyles({
   card: {
     width: 345,
     display: 'inline-block',
     margin: '20px',
-    verticalAlign: 'top'
+    verticalAlign: 'top',
   },
   movieImage: {
-    width: '100%'
+    width: '100%',
   },
   expandClose: {
-    transform: 'rotate(0deg)'
+    transform: 'rotate(0deg)',
   },
   expandOpen: {
     transform: 'rotate(180deg)',
@@ -31,27 +31,29 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     backgroundColor: '#fff',
     borderRadius: '5px',
     width: '82px',
-    marginRight: '-75px'
+    marginRight: '-75px',
   },
   header: {
-      paddingBottom: '0'
+    paddingBottom: '0',
   },
   svgImage: {
-    width: '36px'
-  }
+    width: '36px',
+  },
 }));
 
-const TitleDisplayCards = (props) => {
+const TitleDisplayCards = ({ titles, handleExpandClick }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      {props.titles.map((item, idx) => (
-        <Card className={classes.card} key={idx}>
+      {titles.map((item, idx) => (
+        <Card className={classes.card} key={item.TitleId}>
           <CardHeader
             avatar={
-                <Avatar aria-label="recipe" className={classes.avatar}>
-                <img className={classes.svgImage} src="images/popcorn.svg"/>
-                </Avatar>
+            (
+              <Avatar aria-label="recipe" className={classes.avatar}>
+                <img alt="popcorm" className={classes.svgImage} src="images/popcorn.svg" />
+              </Avatar>
+            )
             }
             title={item.TitleName}
             subheader={item.ReleaseYear}
@@ -59,21 +61,24 @@ const TitleDisplayCards = (props) => {
           />
           <CardActions disableSpacing>
             <IconButton
-              className={props.titles[idx].expanded ? classes.expandClose : classes.expandOpen}
-              onClick={e => props.handleExpandClick(idx)}
+              className={titles[idx].expanded ? classes.expandClose : classes.expandOpen}
+              onClick={() => handleExpandClick(idx)}
               aria-label="show more"
             >
               <ExpandMoreIcon />
             </IconButton>
           </CardActions>
-          <Collapse in={!props.titles[idx].expanded} timeout="auto" unmountOnExit>
-          <img className={classes.movieImage} src={props.titles[idx].imageUrl ? 'https://image.tmdb.org/t/p/w300/' + props.titles[idx].imageUrl 
-                    : "images/cinema.jpg"} />
-          <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p">
-              {item.Genres ? `Genre: ${item.Genres[0]}` : "This one's all over the place."}
-            </Typography>
-          </CardContent>
+          <Collapse in={!titles[idx].expanded} timeout="auto" unmountOnExit>
+            <img
+              alt="movieimage"
+              className={classes.movieImage}
+              src={titles[idx].imageUrl ? `https://image.tmdb.org/t/p/w300/${titles[idx].imageUrl}` : 'images/cinema.jpg'}
+            />
+            <CardContent>
+              <Typography variant="body2" color="textSecondary" component="p">
+                {item.Genres ? `Genre: ${item.Genres[0]}` : "This one's all over the place."}
+              </Typography>
+            </CardContent>
             <CardContent>
               <Typography paragraph>Synopsis:</Typography>
               <Typography paragraph>
@@ -85,6 +90,15 @@ const TitleDisplayCards = (props) => {
       ))}
     </React.Fragment>
   );
+};
+
+TitleDisplayCards.propTypes = {
+  titles: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.object,
+    ]),
+  ).isRequired,
+  handleExpandClick: PropTypes.func.isRequired,
 };
 
 export default TitleDisplayCards;

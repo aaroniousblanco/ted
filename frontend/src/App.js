@@ -14,7 +14,6 @@ class App extends React.Component {
     };
   }
 
-
 setSearchTermInput = (e) => {
   this.setState({
     currentSearchTerm: e.target.value,
@@ -25,57 +24,61 @@ setSearchTermInput = (e) => {
 fetchTitles = async (event) => {
   event.preventDefault();
   // search results
-  const response = await fetch(`http://localhost:3001/title-search/${this.state.currentSearchTerm}`);
+  const { currentSearchTerm } = this.state;
+  if (currentSearchTerm.length < 1) {
+    return;
+  }
+  const response = await fetch(`http://localhost:3001/title-search/${currentSearchTerm}`);
   // parse results
   const myJson = await response.json();
-  // business data
-  console.log(myJson);
   // set state with search results
-  const resultsChecked = myJson.length > 0 ? myJson : [];
-  resultsChecked.forEach(item => {
-    item.expanded = 'false';
+  let resultsChecked = myJson.length > 0 ? myJson : [];
+  resultsChecked = resultsChecked.map((item) => {
+    const itemCopy = item;
+    itemCopy.expanded = 'false';
+    return itemCopy;
   });
   this.setState({
     titles: resultsChecked,
   });
 };
 
-   handleExpandClick =  async (idx) => {
-    const shallowCopy = [...this.state.titles];
-    console.log(shallowCopy);
-    shallowCopy[idx].expanded = !shallowCopy[idx].expanded;
-    this.setState({
-        titles: shallowCopy
-    });
-    // search results
-    const response = await fetch(`http://localhost:3001/fetch-image/?q=${shallowCopy[idx].TitleName}&d=${shallowCopy[idx].ReleaseYear}`);
-    // parse results
-    const imageUrl = await response.json();
-    // business data
-    if (imageUrl) {
-        shallowCopy[idx].imageUrl = imageUrl;
-    }
-    this.setState({
-        titles: shallowCopy
-    });
-  };
+   handleExpandClick = async (idx) => {
+     const { titles } = this.state;
+     titles[idx].expanded = !titles[idx].expanded;
+     this.setState({
+       titles,
+     });
+     // search results
+     const response = await fetch(`http://localhost:3001/fetch-image/?q=${titles[idx].TitleName}&d=${titles[idx].ReleaseYear}`);
+     // parse results
+     const imageUrl = await response.json();
+     // business data
+     if (imageUrl) {
+       titles[idx].imageUrl = imageUrl;
+     }
+     this.setState({
+       titles,
+     });
+   };
 
-  render() {
-    return (
-      <div className="App">
-        <Header />
-        <SearchForm
-          fetchTitles={this.fetchTitles}
-          setSearchTermInput={this.setSearchTermInput}
-        />
-        <Card
-          titles={this.state.titles}
-          handleExpandClick={this.handleExpandClick}
-        />
-      </div>
+   render() {
+     const { titles } = this.state;
+     return (
+       <div className="App">
+         <Header />
+         <SearchForm
+           fetchTitles={this.fetchTitles}
+           setSearchTermInput={this.setSearchTermInput}
+         />
+         <Card
+           titles={titles}
+           handleExpandClick={this.handleExpandClick}
+         />
+       </div>
 
-    );
-  }
+     );
+   }
 }
 
 export default App;

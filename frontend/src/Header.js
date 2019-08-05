@@ -6,12 +6,17 @@ import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   bar: {
     backgroundColor: '#1976d2',
-    color: '#fff'
-  }
+    color: '#fff',
+  },
+  clapper: {
+    height: '33px',
+    position: 'absolute',
+    right: '30px',
+  },
 });
 
 const SimpleAppBar = () => {
@@ -24,10 +29,11 @@ const SimpleAppBar = () => {
           <Typography variant="h5" color="inherit">
             Ted Search
           </Typography>
+          <img className={classes.clapper} src="images/clapperboard.svg" alt="clapperboard" />
         </Toolbar>
       </AppBar>
     </div>
   );
-}
+};
 
 export default SimpleAppBar;
