@@ -26,45 +26,32 @@ app.get('/title-search/:searchterm', (req, res) => {
             console.log('Error!');
             throw err;
         }
-        // console.log(titleObjects.length);
-        let promiseArray = titleObjects.map(item => {
-            const options = {
-                url: 'https://api.themoviedb.org/3/search/movie?api_key=5620c9ef014e2151ab6862dd92e79231&query=' + item.TitleName
-              };
-              return rp(options);
-        });
-        // console.log(promiseArray.length);
-        Promise.all(promiseArray)
-            .then(results => {
-                let movieDbResults = results.length ? JSON.parse(results[0]) : 'none';
-
-                // loop thru results from db query and compare to results from moviedb to return matching images
-                let matchedArray = [];
-                titleObjects.forEach(titleObject => {
-                    console.log('hey')
-                    let matched = movieDbResults.results.map(movieDbItem =>{
-                        let date = new Date(movieDbItem.release_date).getFullYear();
-                        console.log('outside', movieDbItem.title, titleObject.TitleName, titleObject.ReleaseYear, date);
-                        if (movieDbItem.title.toLowerCase() == titleObject.TitleName.toLowerCase() && titleObject.ReleaseYear == date) {
-                            titleObject.imageUrl = movieDbItem.backdrop_path ? movieDbItem.backdrop_path : '';
-                            console.log('inside', movieDbItem.title, titleObject.TitleName, titleObject.ReleaseYear, date);
-                        } else {
-                            // matchedArray.push(titleObject);
-                        }
-                    });
-                });
-                // let mergedArray = [...titleObjects, ...matchedArray];
-                console.log('test', matchedArray.length, matchedArray);
-                res.send(JSON.stringify(titleObjects));
-            });
-        // console.log(test);
-        // res.send(JSON.stringify(test));
+        res.send(JSON.stringify(titleObjects));
   });
+});
+
+app.get('/fetch-image/', (req, res) => {
+    const options = {
+        url: 'https://api.themoviedb.org/3/search/movie?api_key=5620c9ef014e2151ab6862dd92e79231&query=' + req.query.q
+    };
+    rp(options)
+        .then(payload => {
+            let movieDbResults = payload.length ? JSON.parse(payload) : 'none';
+            console.log(movieDbResults.results.length);
+            movieDbResults.results.forEach(movieDbItem => {
+                    let date = new Date(movieDbItem.release_date).getFullYear();
+                if (movieDbItem.title.toLowerCase() == req.query.q.toLowerCase() && req.query.d == date) {
+                    let imageUrl = movieDbItem.backdrop_path ? movieDbItem.backdrop_path : '';
+                    console.log('inside', imageUrl);
+                    res.send(JSON.stringify(imageUrl));
+                }
+            });
+        });
 });
 
 MongoClient.connect(connectionString, { useNewUrlParser: true }, (err, client) => {
   if (err) return console.log(err);
-  db = client.db('dev-challenge'); // whatever your database name is
+  db = client.db('dev-challenge'); 
   
   app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 });
